@@ -19,7 +19,7 @@ def binaryBandwidthSearch(upper=100, lower=0.1, target_value = 1, epsilon = 0.1)
         if not df.is_empty() and 'latency_ms' in df.columns:
             # Use Polars to filter and compute mean
             valid_latencies = df.filter(df['latency_ms'].is_not_null())['latency_ms']
-            if valid_latencies.height > 0:
+            if valid_latencies.len() > 0:
                 average_rtt = valid_latencies.mean()
             else:
                 raise ValueError('No valid latency values found in ping log')
