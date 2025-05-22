@@ -8,7 +8,7 @@ from mininet.topo import Topo
 
 from topologies import BasicTopologie
 
-def runSingleBandwidthExperiment(topo: Topo = BasicTopologie.SimulationTopo(), queue_size=100, udp_bandwidth=15, test_duration=30, iteration=1, result_base_path='./results/tcp_udp_fairness'):
+def runSingleBandwidthExperiment(queue_size=100, udp_bandwidth=15, test_duration=30, iteration=1, result_base_path='./results/tcp_udp_fairness'):
     # Params for experiment
     tcp_duration = test_duration
     udp_start_delay = 5
@@ -19,7 +19,7 @@ def runSingleBandwidthExperiment(topo: Topo = BasicTopologie.SimulationTopo(), q
     os.makedirs(result_path, exist_ok=True) 
     
     # Create topology with specified queue size
-    topo = Topo(queue_size=queue_size)
+    topo = BasicTopologie.SimulationTopo(queue_size=queue_size)
     net = Mininet(topo=topo, link=TCLink)
     net.start()
     
