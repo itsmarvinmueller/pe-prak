@@ -8,7 +8,7 @@ from mininet.topo import Topo
 
 from topologies import BasicTopologie
 
-def runSingleExperiment(topo: Topo = BasicTopologie.SimulationTopo(), queue_size=100, test_duration=30, iteration=1, result_base_path='./results/tcp_udp_fairness'):
+def runSingleExperiment(topo: Topo = BasicTopologie.SimulationTopo(), queue_size=100, udp_bandwidth=15, test_duration=30, iteration=1, result_base_path='./results/tcp_udp_fairness'):
     # Params for experiment
     tcp_duration = test_duration
     udp_start_delay = 5
@@ -43,7 +43,7 @@ def runSingleExperiment(topo: Topo = BasicTopologie.SimulationTopo(), queue_size
     
     # s2 -> Runs udp client with short delay
     time.sleep(udp_start_delay)
-    s2.cmd(f'iperf3 -c {server_ip} -p 5202 -u -b 15M --length 100 -i 5 -t {udp_duration} -J > {result_path}/iperf3_udp.json &')
+    s2.cmd(f'iperf3 -c {server_ip} -p 5202 -u -b {udp_bandwidth}M --length 100 -i 5 -t {udp_duration} -J > {result_path}/iperf3_udp.json &')
     
     time.sleep(tcp_duration + 5)
     
@@ -55,6 +55,7 @@ def runSingleExperiment(topo: Topo = BasicTopologie.SimulationTopo(), queue_size
     net.stop()
     
     info(f"\n*** Iteration {iteration} completed with parameters:\n")
+    info(f"    - UDP bandwidth: {udp_bandwidth}M\n")
     info(f"    - Queue size: {queue_size} packets\n")
     info(f"    - Test duration: {test_duration} seconds\n")
     info(f"    - Results saved in {result_path}\n")
