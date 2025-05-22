@@ -11,6 +11,7 @@ def binaryBandwidthSearch(upper=100, lower=0.1, target_value = 1, epsilon = 0.1)
     middle = (upper + lower) / 2
     middles.append(middle)
     while not (target_value - epsilon <= average_rtt <= target_value + epsilon):
+        print(f"Searching for bandwidth: {middle} Mbit/s")
         base_path = runSingleBandwidthExperiment(udp_bandwidth=middle)
         # Parse ping log to get RTTs
         ping_log_path = os.path.join(base_path, 'ping_result.log')
@@ -32,6 +33,7 @@ def binaryBandwidthSearch(upper=100, lower=0.1, target_value = 1, epsilon = 0.1)
         else:
             lower = middle
             middle = (middle + upper) / 2
+        print(f"Average RTT: {average_rtt} ms")
         middles.append(middle)
 
     return middle, average_rtt, middles
@@ -46,6 +48,7 @@ def runMultipleBinaryBandwidthSearch(n, upper=100, lower=0.1, target_value=1, ep
     if random_seed is not None:
         np.random.seed(random_seed)
     for i in range(n):
+        print(f"Running binary bandwidth search iteration {i + 1}/{n}")
         result = {}
         middle, average_rtt, middles = binaryBandwidthSearch(upper=upper, lower=lower, target_value=target_value, epsilon=epsilon)
         result['middle'] = middle
