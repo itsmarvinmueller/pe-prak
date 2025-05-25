@@ -18,10 +18,15 @@ def binaryBandwidthSearch(upper=100, lower=0.1, target_value = 1, epsilon = 0.1)
         df = parse_ping_log(ping_log_path)
         # Calculate average RTT, ignoring NaN values (Polars DataFrame)
         if not df.is_empty() and 'latency_ms' in df.columns:
-            # Replace nulls and NaNs with 10000, then compute mean
+            # Replace nulls with 10000
             latencies = df['latency_ms'].fill_null(10000)
-            # polars does not have fill_nan, so use apply for NaN
-            latencies = latencies.apply(lambda x: 10000 if isinstance(x, float) and (x != x) else x)
+            # Replace NaNs with 10000 using pl.Series.fill_nan (polars >=0.19.0)
+            try:
+                latencies = latencies.fill_nan(10000)
+            except AttributeError:
+                # For older polars, fallback to numpy
+                import numpy as np
+                latencies = pl.Series([10000 if (isinstance(x, float) and np.isnan(x)) else x for x in latencies])
             if latencies.len() > 0:
                 average_rtt = latencies.mean()
             else:
