@@ -18,14 +18,14 @@ def binaryBandwidthSearch(upper=100, lower=0.1, target_value = 1, epsilon = 0.1)
         df = parse_ping_log(ping_log_path)
         # Calculate average RTT, ignoring NaN values (Polars DataFrame)
         if not df.is_empty() and 'latency_ms' in df.columns:
-            # Use Polars to filter and compute mean
-            valid_latencies = df.filter(df['latency_ms'].is_not_null())['latency_ms']
-            valid_latencies = valid_latencies.drop_nulls()
-            valid_latencies = valid_latencies.filter(~valid_latencies.is_nan())
-            if valid_latencies.len() > 0:
-                average_rtt = valid_latencies.mean()
+            # Replace nulls and NaNs with 10000, then compute mean
+            latencies = df['latency_ms'].fill_null(10000)
+            # polars does not have fill_nan, so use apply for NaN
+            latencies = latencies.apply(lambda x: 10000 if isinstance(x, float) and (x != x) else x)
+            if latencies.len() > 0:
+                average_rtt = latencies.mean()
             else:
-                raise ValueError('No valid latency values found in ping log')
+                raise ValueError('No latency values found in ping log')
         else:
             raise ValueError('Ping log DataFrame is empty or missing latency_ms column')
 
