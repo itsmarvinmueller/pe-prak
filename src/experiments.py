@@ -22,7 +22,8 @@ def runSingleBandwidthExperiment(queue_size=100, udp_bandwidth=15, test_duration
     net.start()
     
     s1, s2, s3, s4 = net.get('s1', 's2', 's3', 's4')
-    server_ip = s2.IP()
+    # s1 -> s3 TCP, s2 -> s4 UDP	
+    tcp_server_ip = s3.IP()
     udp_server_ip = s4.IP()
 
     # Start iperf3 udp server on s4 with port 5202
@@ -31,11 +32,11 @@ def runSingleBandwidthExperiment(queue_size=100, udp_bandwidth=15, test_duration
 
     # Ping for monitoring response times and unfairness between TCP (icmp) and UDP flow
     s1.cmd(f'echo "Start pinging: $(date)" > {result_path}/ping_start.log 2>&1')
-    s1.cmd(f'ping -i 1 -w {test_duration + 5} {server_ip} > {result_path}/ping_result.log 2>&1 &')
+    s1.cmd(f'ping -i 1 -w {test_duration + 5} {tcp_server_ip} > {result_path}/ping_result.log 2>&1 &')
 
     # Start iperf3 udp client on s3
     time.sleep(udp_start_delay)
-    s3.cmd(f'iperf3 -c {udp_server_ip} -p 5202 -u -b {udp_bandwidth}M --length 100 -i 5 -t {udp_duration} -J > {result_path}/iperf3_udp.json &')
+    s2.cmd(f'iperf3 -c {udp_server_ip} -p 5202 -u -b {udp_bandwidth}M --length 100 -i 5 -t {udp_duration} -J > {result_path}/iperf3_udp.json &')
     
     time.sleep(test_duration + 5)
     
