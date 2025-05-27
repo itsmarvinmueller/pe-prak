@@ -15,9 +15,11 @@ class SimulationTopo(Topo):
         
         # Routers (as switches)
         r1 = self.addSwitch('r1', cls=OVSKernelSwitch)
+        r2 = self.addSwitch('r2', cls=OVSKernelSwitch)
         
         # Links
-        self.addLink(s1, r1, bw=10, delay='0.1ms')
-        self.addLink(s2, r1, bw=10, delay='0.1ms')
-        self.addLink(s3, r1, bw=10, delay='0.1ms')
-        self.addLink(s4, r1, bw=10, delay='0.1ms')
+        self.addLink(s1, r1, bw=10, delay='2ms')
+        self.addLink(s2, r1, bw=10, delay='3ms')
+        self.addLink(r1, r2, bw=1.5, delay='3ms')
+        self.addLink(r2, s3, bw=10, delay='10ms')
+        self.addLink(r2, s4, bw=0.5, delay='5ms', max_queue_size=self.queue_size)

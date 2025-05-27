@@ -22,6 +22,7 @@ def binaryBandwidthSearch(upper=100, lower=0.1, target_value = 1, epsilon = 0.1)
             latencies = df['latency_ms'].fill_null(10000)
             # Replace NaNs with 10000 using pl.Series.fill_nan (polars >=0.19.0)
             try:
+                print(latencies)
                 latencies = latencies.fill_nan(10000)
             except AttributeError:
                 # For older polars, fallback to numpy
