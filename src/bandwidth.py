@@ -68,19 +68,17 @@ def runMultipleBinaryBandwidthSearch(n, upper=100, lower=0.1, target_value=1, ep
     middle_values = [r['middle'] for r in results]
 
     # Boxplot with 95% confidence interval
-    fig, ax = plt.subplots(figsize=(8, 6))
-    box = ax.boxplot(middle_values, patch_artist=True, notch=True, widths=0.5, showmeans=True)
-    ax.set_title(f"Distribution of Found Bandwidths (n={n})")
-    ax.set_ylabel("UDP Bandwidth (Mbit/s)")
-    ax.set_xticks([1])
-    ax.set_xticklabels(["binaryBandwidthSearch"])
-
-    # Calculate and plot 95% confidence interval
-    mean = np.mean(middle_values)
-    sem = np.std(middle_values, ddof=1) / np.sqrt(len(middle_values))
-    ci95 = 1.96 * sem
-    ax.errorbar(1, mean, yerr=ci95, fmt='o', color='red', label='95% CI')
-    ax.legend()
+    plt.figure(figsize=(8, 6))
+    median = np.median(middle_values)
+    percentile95 = np.percentile(middle_values, 95)
+    print(f"Gesamte Messung - Median: {median:.2f} ms, 95%-Perzentil: {percentile95:.2f} ms")
+    box = plt.boxplot([middle_values], labels=['Gesamte Messung'], patch_artist=True, flierprops=dict(marker='o', markerfacecolor='red', markersize=8))
+    plt.scatter(1, median, color='black', marker='D', label='Median')
+    plt.scatter(1, percentile95, color='purple', marker='X', label='95%-Perzentil')
+    plt.title(f"Distribution of Found Bandwidths (n={n})")
+    plt.ylabel("UDP Bandwidth (Mbit/s)")
+    plt.xticks([1])
+    plt.legend()
     plt.tight_layout()
     plt.savefig('bandwidth_search_results.png')
 
